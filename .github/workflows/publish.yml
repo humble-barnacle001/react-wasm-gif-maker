@@ -6,18 +6,13 @@ name: Node.js CI
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        node-version: [16.x]
 
     steps:
     - name: Cache
@@ -31,5 +26,14 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install
-    - run: npm run build --if-present
+    - run: npm run build
     - run: ls -la
+    - name: Publish to GitHub pages
+      uses: crazy-max/ghaction-github-pages@v2.3.0
+      with:
+          target_branch: gh-pages
+          build_dir: build/
+#           keep_history: true
+          commit_message: Deploy to GitHub pages ${{ github.sha }}
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
